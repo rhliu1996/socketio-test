@@ -34,6 +34,11 @@
         #value-domain {
             padding: 10px 20px;
         }
+
+        .hint {
+            color: #aaa;
+            font-size: 12px;
+        }
     </style>
 
     <script src="js/socket.io.v2.3.0.js"></script>
@@ -123,28 +128,30 @@
 
 <body>
 
-<h1>Netty-socketio Online Test</h1>
+<div style="width: 80%; margin: auto">
+    <h1>Netty-socketio Online Test</h1>
+    <h4>websocket在线测试</h4>
+</div>
 
 <br/>
 
 <div class="well form-inline" onsubmit="return false;">
+    <div class="hint">url：请求路径，支持协议：ws(s)、http(s)；listenEvent：要监听的事件</div>
     <label for="url">URL：</label><input id="url" class="input-xxlarge" type="text"
-                                        value="http://127.0.0.1:8897/socketio/voiceEvaluateSocket?token=1&curriculumId=2"
-                                        placeholder="ws://ip:port..."/>
-    <label for="listenEvent"></label><input id="listenEvent" class="input-small" type="text" value="message"
+                                        placeholder='ws://ip:port/path?param1=""&param2=""'/>
+    <label for="listenEvent"></label><input id="listenEvent" class="input-small" type="text"
                                             placeholder="listenEvent..."/>
     <button type="button" onClick="connect()" class="btn" id="connect">Connect</button>
 </div>
 
-<div id="console" class="well">
-</div>
+<div id="console" class="well"></div>
 
 <form class="well form-inline" onsubmit="return false;">
-    <label for="sendEvent"></label><input id="sendEvent" class="input-small" type="text" value="a"
-                                          placeholder="sendEvent..."/>
+    <label for="sendEvent"></label><input id="sendEvent" class="input-small" type="text" placeholder="sendEvent..."/>
     <label for="msg"></label><input id="msg" class="input-xlarge" type="text" placeholder="Message something..."/>
     <button type="button" onClick="sendMessage()" class="btn" id="send">Send</button>
     <button type="button" onClick="sendDisconnect()" class="btn">Disconnect</button>
+    <div class="hint">sendEvent：发送事件；Message something：要发送的数据，支持json</div>
 </form>
 
 </body>

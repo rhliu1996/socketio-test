@@ -51,21 +51,21 @@
     <script>
         var socket;
 
-        function disconnect() {
+        function sendDisconnect() {
             if (typeof (socket) != "undefined") {
                 socket.close();
             }
         }
 
         function connect() {
-            disconnect();
+            sendDisconnect();
 
-            var url = $("#url").val();
-            if (isEmpty(url)) {
+            var url = $.trim($("#url").val());
+            if (url.length === 0) {
                 return;
             }
 
-            var listenEvent = $('#listenEvent').val();
+            var listenEvent = $.trim($('#listenEvent').val());
 
             socket = io(url, {
                 transports: ['websocket'], // 直接升级为ws协议
@@ -95,7 +95,7 @@
         function sendMessage() {
             var msg = $('#msg').val();
 
-            var sendEvent = $('#sendEvent').val();
+            var sendEvent = $.trim($('#sendEvent').val());
 
             if (typeof (socket) != "undefined") {
                 socket.emit(sendEvent, msg);
@@ -115,7 +115,7 @@
         });
 
         $(window).on('beforeunload', function () {
-            disconnect();
+            sendDisconnect();
         });
 
         function isJson(str) {
@@ -128,10 +128,6 @@
             } catch (e) {
                 return false
             }
-        }
-
-        function isEmpty(obj) {
-            return typeof (obj) == "undefined" || $.trim(obj).length === 0;
         }
     </script>
 </head>
@@ -160,7 +156,7 @@
     <label for="sendEvent"></label><input id="sendEvent" class="input-small" type="text" placeholder="sendEvent..."/>
     <label for="msg"></label><input id="msg" class="input-xlarge" type="text" placeholder="Message something..."/>
     <button type="button" onClick="sendMessage()" class="btn" id="send">Send</button>
-    <button type="button" onClick="disconnect()" class="btn">Disconnect</button>
+    <button type="button" onClick="sendDisconnect()" class="btn">Disconnect</button>
     <div class="tips">sendEvent：发送事件；Message something：要发送的数据，支持json</div>
 </form>
 

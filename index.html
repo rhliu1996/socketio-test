@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="utf-8">
 <head>
 
     <meta charset="utf-8"/>
@@ -7,6 +7,7 @@
     <title>Demo Chat</title>
 
     <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/jquery.jsonview.css" rel="stylesheet">
 
     <style>
         body {
@@ -18,7 +19,7 @@
             overflow: auto;
         }
 
-        .username-msg {
+        .time-msg {
             color: orange;
         }
 
@@ -30,30 +31,38 @@
             color: red;
         }
 
-        .send-msg {
-            color: #888
+        #value-domain {
+            padding: 10px 20px;
         }
     </style>
 
-    <script src="js/socket.io.js"></script>
+    <script src="js/socket.io.v2.3.0.js"></script>
     <script src="js/moment.min.js"></script>
     <script src="js/jquery-1.10.1.min.js"></script>
+    <script src="js/jquery.jsonview.js"></script>
 
     <script>
-
         var socket;
 
         function sendDisconnect() {
-            socket.close();
-            socket = null;
-            console.log(socket);
+            if (typeof (socket) != "undefined") {
+                socket.close();
+            }
         }
 
         function connect() {
-            var url = $('#url').val();
+            var url = $("#url").val();
             var listenEvent = $('#listenEvent').val();
 
-            socket = io.connect(url);
+            if (typeof (socket) != "undefined") {
+                socket.close();
+            }
+
+            socket = io(url, {
+                transports: ['websocket'], // 直接升级为ws协议
+                forceNew: true // 创建新通道连接
+                // query: {} // 设置请求参数
+            });
 
             socket.on('connect', function () {
                 output('<span class="connect-msg">Client has connected to the server!</span>');
@@ -64,33 +73,51 @@
             });
 
             socket.on(listenEvent, function (data) {
-                output('<span class="username-msg"> ####:</span> ' + data);
+                output('<div id="value-domain"></div>');
+                var $dataValue = $('#value-domain');
+                if (!isJson(data)) {
+                    $dataValue.append(data);
+                } else {
+                    $dataValue.JSONView(data, {collapsed: true});
+                }
             });
         }
 
         function sendMessage() {
-            var message = $('#msg').val();
-            $('#msg').val('');
+            var msg = $('#msg').val();
 
             var sendEvent = $('#sendEvent').val();
 
-            var jsonObject = {
-                message: message
-            };
-            socket.emit(sendEvent, jsonObject);
+            socket.emit(sendEvent, msg);
         }
 
         function output(message) {
-            var currentTime = "<span class='time'>" + moment().format('HH:mm:ss.SSS') + "</span>";
+            var currentTime = "<span class='time, time-msg'>" + moment().format('HH:mm:ss.SSS') + ":</span>";
             var element = $("<div>" + currentTime + " " + message + "</div>");
             $('#console').prepend(element);
         }
 
-        $(document).keydown(function (e) {
-            if (e.keyCode == 13) {
+        $(document).keydown(function (keyboard) {
+            if (keyboard.key === 'Enter') {
                 $('#send').click();
             }
         });
+
+        $(window).on('beforeunload', function () {
+            sendDisconnect();
+        });
+
+        function isJson(str) {
+            try {
+                if (typeof (str) == "object") {
+                    return true
+                }
+                $.parseJSON(str);
+                return true
+            } catch (e) {
+                return false
+            }
+        }
     </script>
 </head>
 
@@ -101,9 +128,11 @@
 <br/>
 
 <div class="well form-inline" onsubmit="return false;">
-    url:
-    <input id="url" class="input-xxlarge" type="text" placeholder="http://ip:port..."/>
-    <input id="listenEvent" class="input-small" type="text" placeholder="listenEvent..."/>
+    <label for="url">URL：</label><input id="url" class="input-xxlarge" type="text"
+                                        value="http://127.0.0.1:8897/socketio/voiceEvaluateSocket?token=1&curriculumId=2"
+                                        placeholder="ws://ip:port..."/>
+    <label for="listenEvent"></label><input id="listenEvent" class="input-small" type="text" value="message"
+                                            placeholder="listenEvent..."/>
     <button type="button" onClick="connect()" class="btn" id="connect">Connect</button>
 </div>
 
@@ -111,8 +140,9 @@
 </div>
 
 <form class="well form-inline" onsubmit="return false;">
-    <input id="sendEvent" class="input-small" type="text" placeholder="sendEvent..."/>
-    <input id="msg" class="input-xlarge" type="text" placeholder="Message something..."/>
+    <label for="sendEvent"></label><input id="sendEvent" class="input-small" type="text" value="a"
+                                          placeholder="sendEvent..."/>
+    <label for="msg"></label><input id="msg" class="input-xlarge" type="text" placeholder="Message something..."/>
     <button type="button" onClick="sendMessage()" class="btn" id="send">Send</button>
     <button type="button" onClick="sendDisconnect()" class="btn">Disconnect</button>
 </form>

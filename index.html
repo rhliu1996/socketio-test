@@ -37,7 +37,7 @@
             padding: 10px 20px;
         }
 
-        .hint {
+        .tips {
             color: #aaa;
             font-size: 12px;
         }
@@ -51,19 +51,21 @@
     <script>
         var socket;
 
-        function sendDisconnect() {
+        function disconnect() {
             if (typeof (socket) != "undefined") {
                 socket.close();
             }
         }
 
         function connect() {
-            var url = $("#url").val();
-            var listenEvent = $('#listenEvent').val();
+            disconnect();
 
-            if (typeof (socket) != "undefined") {
-                socket.close();
+            var url = $("#url").val();
+            if (isEmpty(url)) {
+                return;
             }
+
+            var listenEvent = $('#listenEvent').val();
 
             socket = io(url, {
                 transports: ['websocket'], // 直接升级为ws协议
@@ -95,7 +97,9 @@
 
             var sendEvent = $('#sendEvent').val();
 
-            socket.emit(sendEvent, msg);
+            if (typeof (socket) != "undefined") {
+                socket.emit(sendEvent, msg);
+            }
         }
 
         function output(message) {
@@ -111,7 +115,7 @@
         });
 
         $(window).on('beforeunload', function () {
-            sendDisconnect();
+            disconnect();
         });
 
         function isJson(str) {
@@ -124,6 +128,10 @@
             } catch (e) {
                 return false
             }
+        }
+
+        function isEmpty(obj) {
+            return typeof (obj) == "undefined" || $.trim(obj).length === 0;
         }
     </script>
 </head>
@@ -138,7 +146,7 @@
 <br/>
 
 <div class="well form-inline" onsubmit="return false;">
-    <div class="hint">url：请求路径，支持协议：ws(s)、http(s)；listenEvent：要监听的事件</div>
+    <div class="tips">url：请求路径，支持协议：ws(s)、http(s)；listenEvent：要监听的事件</div>
     <label for="url">URL：</label><input id="url" class="input-xxlarge" type="text"
                                         placeholder='ws://ip:port/path?param1=""&param2=""'/>
     <label for="listenEvent"></label><input id="listenEvent" class="input-small" type="text"
@@ -152,8 +160,8 @@
     <label for="sendEvent"></label><input id="sendEvent" class="input-small" type="text" placeholder="sendEvent..."/>
     <label for="msg"></label><input id="msg" class="input-xlarge" type="text" placeholder="Message something..."/>
     <button type="button" onClick="sendMessage()" class="btn" id="send">Send</button>
-    <button type="button" onClick="sendDisconnect()" class="btn">Disconnect</button>
-    <div class="hint">sendEvent：发送事件；Message something：要发送的数据，支持json</div>
+    <button type="button" onClick="disconnect()" class="btn">Disconnect</button>
+    <div class="tips">sendEvent：发送事件；Message something：要发送的数据，支持json</div>
 </form>
 
 </body>

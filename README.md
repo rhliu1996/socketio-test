@@ -1,3 +1,2 @@
 # socketio在线测试
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1112/190336_844fc842_4993198.png "屏幕截图.png")
 ![输入图片说明](images/image.png)

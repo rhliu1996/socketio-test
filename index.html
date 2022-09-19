@@ -144,9 +144,9 @@
 <div class="well form-inline" onsubmit="return false;">
     <div class="tips">url：请求路径，支持协议：ws(s)、http(s)；listenEvent：要监听的事件</div>
     <label for="url">URL：</label><input id="url" class="input-xxlarge" type="text"
-                                        placeholder='ws://ip:port/path?param1=""&param2=""'/>
+                                        placeholder='ws://ip:port/path?param1=""&param2=""' value='ws://127.0.0.1:3000'/>
     <label for="listenEvent"></label><input id="listenEvent" class="input-small" type="text"
-                                            placeholder="listenEvent..."/>
+                                            placeholder="listenEvent..." value='message' />
     <button type="button" onClick="connect()" class="btn" id="connect">Connect</button>
 </div>
 
